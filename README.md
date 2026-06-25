@@ -1,3 +1,12 @@
+---
+title: Nurture AI
+emoji: 🍼
+colorFrom: purple
+colorTo: gray
+sdk: docker
+app_port: 7860
+---
+
 <div align="center">
 
 # 🍼 Nurture AI
