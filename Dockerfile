@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS builder
+FROM python:3.10-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
@@ -9,42 +9,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.10-slim
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    FLASK_ENV=production \
+    PYTHONUNBUFFERED=1
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libgomp1 \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR $HOME/app
 
-COPY --from=builder /install /usr/local
+COPY --chown=user fusion/ fusion/
+COPY --chown=user models/ models/
+COPY --chown=user static/ static/
+COPY --chown=user templates/ templates/
+COPY --chown=user app.py db.py ./
+COPY --chown=user requirements.txt ./
 
-RUN addgroup --system --gid 1001 app && \
-    adduser --system --uid 1001 --gid 1001 app
-
-WORKDIR /app
-
-COPY --chown=app:app fusion/ fusion/
-COPY --chown=app:app models/ models/
-COPY --chown=app:app static/ static/
-COPY --chown=app:app templates/ templates/
-COPY --chown=app:app app.py db.py ./
-COPY --chown=app:app requirements.txt ./
-
-RUN mkdir -p uploads && chown app:app uploads
-
-USER app
+RUN mkdir -p uploads
 
 EXPOSE 7860
 
-ENV FLASK_ENV=production \
-    PYTHONUNBUFFERED=1
-
-CMD gunicorn app:app \
-    --bind 0.0.0.0:$(PORT) \
-    --workers 1 \
-    --threads 4 \
-    --timeout 120 \
-    --access-logfile - \
-    --error-logfile -
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:7860", "--workers", "1", "--threads", "4", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
