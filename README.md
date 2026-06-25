@@ -163,21 +163,23 @@ python-dotenv
 
 ```
 nurture-ai/
-├── app.py                       # Flask application (routes, auth, upload)
-├── db.py                        # MongoDB connection & collections
+├── app.py                               # Flask application (routes, auth, upload)
+├── db.py                                # MongoDB connection & collections
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
 ├── fusion/
-│   └── prediction_pipeline.py   # Multimodal pipeline (audio + video)
+│   └── prediction_pipeline.py           # Multimodal pipeline (audio + video)
 ├── models/
 │   ├── binary_cry_model.keras
 │   ├── multiclass_cry_model.keras
 │   ├── visual_emotion_model.keras
-│   └── *.npy                    # Class names & normalization stats
+│   └── *.npy                            # Class names & normalization stats
 ├── static/
-│   ├── css/style.css
-│   └── js/script.js
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── script.js
 ├── templates/
 │   ├── base.html
 │   ├── homepage.html
@@ -186,7 +188,7 @@ nurture-ai/
 │   ├── result.html
 │   ├── history.html
 │   └── feedback.html
-└── uploads/                     # Uploaded videos (gitignored)
+└── uploads/                             # Uploaded videos (gitignored)
 ```
 
 ---
