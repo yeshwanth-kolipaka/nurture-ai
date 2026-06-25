@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Baby Cry Analyzer{% endblock %}
+
+{% block content %}
+<main class="dashboard">
+  <section class="hero-section">
+    <div class="hero-copy">
+      <span class="eyebrow"><i></i> Multimodal infant intelligence</span>
+      <h1>Understand every cry with greater <span>clarity.</span></h1>
+      <p>Welcome, {{ user.name }}. NurtureAI combines vocal patterns and visual cues to turn a short video into clear, actionable caregiver insights.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#upload-section">Start new analysis <span>&rarr;</span></a>
+        <a class="button text-button" href="#how-it-works">See how it works</a>
+      </div>
+      <div class="trust-row">
+        <span><strong>Audio + visual</strong> multimodal inference</span>
+        <span><strong>Private</strong> session processing</span>
+        <span><strong>Clear</strong> confidence reporting</span>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="visual-glow"></div>
+      <div class="analysis-window">
+        <div class="window-top"><span></span><span></span><span></span><small>Live signal overview</small></div>
+        <div class="signal-preview">
+          <div class="signal-label"><span>Audio pattern</span><strong>Analyzing</strong></div>
+          <div class="waveform">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+        <div class="insight-preview">
+          <div class="preview-icon">AI</div>
+          <div><small>Combined insight</small><strong>Multimodal signals aligned</strong></div>
+          <span>92%</span>
+        </div>
+        <div class="preview-metrics">
+          <div><span class="dot violet"></span><small>Vocal pattern</small><strong>Detected</strong></div>
+          <div><span class="dot teal"></span><small>Visual state</small><strong>Processed</strong></div>
+        </div>
+      </div>
+      <div class="floating-badge badge-secure"><strong>&check;</strong> Secure processing</div>
+      <div class="floating-badge badge-fast"><strong>20</strong> sampled frames</div>
+    </div>
+  </section>
+
+  <section class="content-section" id="how-it-works">
+    <div class="section-heading">
+      <span class="section-kicker">Simple by design</span>
+      <h2>From video to insight in three steps</h2>
+      <p>Advanced multimodal analysis, presented in a way that is calm, clear, and useful.</p>
+    </div>
+
+    <div class="steps-grid">
+      <article class="step-card">
+        <span class="step-number">01</span>
+        <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"/></svg></div>
+        <h3>Upload a short video</h3>
+        <p>Select a clear recording with audible crying and a visible view of your baby.</p>
+      </article>
+      <article class="step-card featured">
+        <span class="step-number">02</span>
+        <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M9 3h6v3H9zM8 6h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Z"/><path d="M9 12h.01M15 12h.01M9 16h6"/></svg></div>
+        <h3>Multimodal AI analysis</h3>
+        <p>Audio frequency patterns and facial emotion cues are evaluated together.</p>
+      </article>
+      <article class="step-card">
+        <span class="step-number">03</span>
+        <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M5 19V9m7 10V5m7 14v-7"/><path d="M3 21h18"/></svg></div>
+        <h3>Review your report</h3>
+        <p>See the likely state, model confidence, reasoning, and a practical suggestion.</p>
+      </article>
+    </div>
+  </section>
+{% endblock %}
+
+{% block content_after %}
+  <section class="upload-section" id="upload-section">
+    <div class="upload-heading">
+      <div>
+        <span class="section-kicker">New analysis</span>
+        <h2>Upload an infant cry video</h2>
+        <p>Your video is processed for this analysis session. MP4, MOV, AVI, MKV, and WebM supported.</p>
+      </div>
+      <span class="privacy-chip"><i></i> Private session</span>
+    </div>
+
+    {% if upload_error %}<div class="alert upload-alert">{{ upload_error }}</div>{% endif %}
+
+    <form action="{{ url_for('upload_video') }}" method="POST" enctype="multipart/form-data" id="upload-form" class="upload-card">
+      <input id="video-input" type="file" name="video" accept="video/*" required hidden>
+
+      <div id="drop-zone" class="drop-zone" tabindex="0" role="button">
+        <div class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"/></svg></div>
+        <h3>Drop your video here</h3>
+        <p>or select a file from your device</p>
+        <button class="button secondary" type="button" id="browse-button">Choose video</button>
+        <small>For best results, use a clear 5-10 second recording</small>
+      </div>
+
+      <div id="file-preview" class="file-preview" hidden>
+        <div class="video-preview-wrap">
+          <video id="video-preview" controls preload="metadata"></video>
+        </div>
+        <div class="file-details">
+          <span class="section-kicker">Selected video</span>
+          <h3 id="file-name"></h3>
+          <p id="file-size"></p>
+          <div class="info-panel"><strong>Ready for analysis</strong>The system will compare audio features with visual emotion signals.</div>
+          <div class="file-actions">
+            <button class="button secondary" type="button" id="remove-file">Choose another</button>
+            <button class="button primary" type="submit">Run analysis <span>&rarr;</span></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+</main>
+{% endblock %}

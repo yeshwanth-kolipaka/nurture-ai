@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Results | Baby Cry Analyzer{% endblock %}
+
+{% block content %}
+<main class="results-page">
+  <div class="results-header">
+    <div>
+      <span class="section-kicker">Multimodal report</span>
+      <h1>Infant Cry Analysis</h1>
+      <p>Combined audio and visual intelligence</p>
+    </div>
+    <a class="button secondary" href="{{ url_for('history') }}">&larr; Back to History</a>
+  </div>
+
+  {% if result %}
+    <section class="success-banner">
+      <span class="success-icon">&check;</span>
+      <div>
+        <strong>Analysis completed successfully</strong>
+        <p>Processed video: {{ original_name }}</p>
+      </div>
+      <span class="status-pill"><i></i> Analysis complete</span>
+    </section>
+
+    <section class="result-grid">
+      <article class="glass-card primary-result">
+        <span class="card-overline">Primary interpretation</span>
+        <h2>{{ result.final_state }}</h2>
+        <div class="confidence-gauge" style="--progress: {{ result.final_confidence * 360 }}deg">
+          <div>
+            <strong>{{ (result.final_confidence * 100) | round(1) }}%</strong>
+            <span>Confidence</span>
+          </div>
+        </div>
+        <div class="reason-box">
+          <strong>Model reasoning</strong>
+          <p>{{ result.reasoning }}</p>
+        </div>
+      </article>
+
+      <div class="result-column">
+        <article class="glass-card breakdown-card">
+          <div class="card-title-row"><div><span class="card-overline">Signal breakdown</span><h3>Multimodal confidence</h3></div><span class="model-pill">3 signals</span></div>
+          <div class="metric">
+            <div><span>Audio: {{ result.audio_result | replace('_', ' ') | title }}</span><strong>{{ (result.audio_confidence * 100) | round(1) }}%</strong></div>
+            <div class="metric-track"><span class="pink-bar" style="width: {{ result.audio_confidence * 100 }}%"></span></div>
+          </div>
+          <div class="metric">
+            <div><span>Visual: {{ result.video_result | replace('_', ' ') | title }}</span><strong>{{ (result.video_confidence * 100) | round(1) }}%</strong></div>
+            <div class="metric-track"><span class="blue-bar" style="width: {{ result.video_confidence * 100 }}%"></span></div>
+          </div>
+          <div class="metric">
+            <div><span>Cry detection: {{ result.binary_result | replace('_', ' ') | title }}</span><strong>{{ (result.binary_confidence * 100) | round(1) }}%</strong></div>
+            <div class="metric-track"><span class="lavender-bar" style="width: {{ result.binary_confidence * 100 }}%"></span></div>
+          </div>
+        </article>
+
+        <article class="recommendation-card">
+          <span class="recommendation-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.7-1.5 1.5-1.5 2.5h-4c0-1-.6-1.8-1.5-2.5Z"/></svg></span>
+          <div>
+            <span class="card-overline">Care guidance</span>
+            <h3>Suggested next step</h3>
+            <p>{{ result.recommendation }}</p>
+          </div>
+        </article>
+
+        <article class="disclaimer">
+          <strong>Important clinical note</strong>
+          <p>This AI-assisted prediction does not replace professional medical advice. Contact a pediatrician if you have concerns about your infant's health.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="glass-card video-result">
+      <div>
+        <span class="card-overline">Source media</span>
+        <h2>{{ original_name }}</h2>
+        <p>Video used for this multimodal assessment.</p>
+      </div>
+      <video controls>
+        <source src="{{ url_for('uploaded_file', filename=video_file) }}">
+        Your browser does not support video playback.
+      </video>
+    </section>
+  {% else %}
+    <section class="glass-card empty-state">
+      <div class="large-icon">B</div>
+      <h2>No cry analysis yet</h2>
+      <p>Upload a crying video from the dashboard to generate your first multimodal report.</p>
+      <a class="button primary" href="{{ url_for('dashboard') }}#upload-section">Upload Video Now</a>
+    </section>
+  {% endif %}
+</main>
+{% endblock %}

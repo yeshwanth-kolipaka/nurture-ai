@@ -1,0 +1,10 @@
+flask
+tensorflow
+opencv-python
+numpy
+librosa
+soundfile
+imageio
+imageio-ffmpeg
+pymongo
+python-dotenv

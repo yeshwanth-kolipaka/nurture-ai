@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | Baby Cry Analyzer{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth-layout">
+  <section class="auth-intro">
+    <span class="eyebrow"><i></i> Intelligent support for caregivers</span>
+    <h1>Better insight. More confident care.</h1>
+    <p>Create your private analysis workspace and turn infant cry videos into structured, easy-to-read reports.</p>
+    <div class="benefit-list">
+      <div><span>&check;</span><p><strong>Multimodal analysis</strong>Audio and facial cues evaluated together.</p></div>
+      <div><span>&check;</span><p><strong>Transparent reporting</strong>Confidence and reasoning shown clearly.</p></div>
+      <div><span>&check;</span><p><strong>Session privacy</strong>Your latest report remains in your session.</p></div>
+    </div>
+  </section>
+
+  <section class="glass-card auth-card">
+    <div class="form-heading">
+      <span class="auth-label">Create workspace</span>
+      <h2>Create your account</h2>
+      <p>Set up your caregiver analysis workspace.</p>
+    </div>
+
+    {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+
+    <form method="POST" class="form-stack">
+      <label>
+        <span>Your name</span>
+        <input type="text" name="username" placeholder="Happy Parent" required>
+      </label>
+      <label>
+        <span>Email address</span>
+        <input type="email" name="email" placeholder="parent@example.com" required>
+      </label>
+      <label>
+        <span>Password</span>
+        <div class="password-wrap">
+          <input type="password" name="password" minlength="8" placeholder="At least 8 characters" required>
+          <button class="password-toggle" type="button">Show</button>
+        </div>
+      </label>
+      <button class="button primary full" type="submit">Create my workspace <span>&rarr;</span></button>
+    </form>
+
+    <p class="form-footer">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+  </section>
+</main>
+{% endblock %}

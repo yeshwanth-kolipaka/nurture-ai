@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Baby Cry Analyzer{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth-layout">
+  <section class="auth-intro">
+    <span class="eyebrow"><i></i> Care informed by intelligence</span>
+    <h1>Clarity when your baby needs you most.</h1>
+    <p>Translate complex cry patterns into understandable insights using audio and visual AI.</p>
+    <div class="auth-proof">
+      <div><strong>2</strong><span>Signals analyzed<br>audio + visual</span></div>
+      <div><strong>1</strong><span>Clear, combined<br>care report</span></div>
+    </div>
+  </section>
+
+  <section class="glass-card auth-card">
+    <div class="form-heading">
+      <span class="auth-label">Secure access</span>
+      <h2>Welcome back</h2>
+      <p>Sign in to access your analysis workspace.</p>
+    </div>
+
+    {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+
+    <form method="POST" class="form-stack">
+      <label>
+        <span>Email address</span>
+        <input type="email" name="email" placeholder="parent@example.com" required>
+      </label>
+      <label>
+        <span>Password</span>
+        <div class="password-wrap">
+          <input type="password" name="password" placeholder="Enter your password" required>
+          <button class="password-toggle" type="button">Show</button>
+        </div>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" name="remember">
+        <span>Remember me</span>
+      </label>
+      <button class="button primary full" type="submit">Sign in to workspace <span>&rarr;</span></button>
+    </form>
+
+    <p class="form-footer">New to Baby Cry Analyzer? <a href="{{ url_for('signup') }}">Create an account</a></p>
+  </section>
+</main>
+{% endblock %}
