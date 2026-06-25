@@ -3,6 +3,7 @@
 # 🍼 Nurture AI
 ### Multimodal Infant Cry Detection & Emotion Analysis
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Hugging_Face-FF9D00?style=for-the-badge&logo=huggingface&logoColor=white)](https://yeshwanth-kolipaka-nurture-ai.hf.space)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://tensorflow.org)
