@@ -11,23 +11,53 @@ import cv2
 import librosa
 import numpy as np
 import subprocess
+import zipfile
+import json
+import tempfile
+import atexit
 
 from tensorflow.keras.models import load_model
-from tensorflow.keras.layers import Dense
 
 from tensorflow.keras.applications.efficientnet import (
     preprocess_input
 )
 
-
-class DenseIgnoreQC(Dense):
-    @classmethod
-    def from_config(cls, config):
-        config.pop("quantization_config", None)
-        return super().from_config(config)
+_TEMP_FILES = []
 
 
-_DENSE_CUSTOM_OBJECTS = {"Dense": DenseIgnoreQC}
+@atexit.register
+def _cleanup():
+    for f in _TEMP_FILES:
+        try:
+            os.unlink(f)
+        except OSError:
+            pass
+
+
+def _strip_qc(obj):
+    if isinstance(obj, dict):
+        obj.pop("quantization_config", None)
+        for v in obj.values():
+            _strip_qc(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_qc(item)
+
+
+def _load_cleaned_model(path):
+    tmp = tempfile.NamedTemporaryFile(suffix=".keras", delete=False)
+    tmp.close()
+    _TEMP_FILES.append(tmp.name)
+    with zipfile.ZipFile(path, "r") as zin:
+        with zipfile.ZipFile(tmp.name, "w") as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename == "config.json":
+                    config = json.loads(data)
+                    _strip_qc(config)
+                    data = json.dumps(config).encode()
+                zout.writestr(item, data)
+    return load_model(tmp.name)
 
 # =========================================================
 # CONFIGURATION
@@ -67,9 +97,8 @@ MAX_TIME_STEPS = 100
 # LOAD VIDEO MODEL
 # =========================================================
 
-visual_model = load_model(
-    "models/visual_emotion_model.keras",
-    custom_objects=_DENSE_CUSTOM_OBJECTS
+visual_model = _load_cleaned_model(
+    "models/visual_emotion_model.keras"
 )
 
 VISUAL_CLASSES = list(
@@ -84,9 +113,8 @@ VISUAL_CLASSES = list(
 
 # load the binary model
 
-binary_model = load_model(
-    "models/binary_cry_model.keras",
-    custom_objects=_DENSE_CUSTOM_OBJECTS
+binary_model = _load_cleaned_model(
+    "models/binary_cry_model.keras"
 )
 
 binary_mean = np.load(
@@ -101,9 +129,8 @@ binary_std = np.load(
 # LOAD AUDIO MODEL
 # =========================================================
 
-audio_model = load_model(
-    "models/multiclass_cry_model.keras",
-    custom_objects=_DENSE_CUSTOM_OBJECTS
+audio_model = _load_cleaned_model(
+    "models/multiclass_cry_model.keras"
 )
 
 audio_mean = np.load(
