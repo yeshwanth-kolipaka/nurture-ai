@@ -163,8 +163,8 @@ python-dotenv
 
 ```
 nurture-ai/
-├── app.py                               # Flask application (routes, auth, upload)
-├── db.py                                # MongoDB connection & collections
+├── app.py                                 # Flask application (routes, auth, upload)
+├── db.py                                  # MongoDB connection & collections
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -188,7 +188,7 @@ nurture-ai/
 │   ├── result.html
 │   ├── history.html
 │   └── feedback.html
-└── uploads/                             # Uploaded videos (gitignored)
+└── uploads/                               # Uploaded videos (gitignored)
 ```
 
 ---
