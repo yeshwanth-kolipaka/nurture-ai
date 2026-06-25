@@ -13,10 +13,23 @@ import numpy as np
 import subprocess
 
 from tensorflow.keras.models import load_model
-
+from tensorflow.keras.layers import Layer
 from tensorflow.keras.applications.efficientnet import (
     preprocess_input
 )
+
+import functools
+
+_original_layer_init = Layer.__init__
+
+
+@functools.wraps(_original_layer_init)
+def _patched_layer_init(self, *args, **kwargs):
+    kwargs.pop("quantization_config", None)
+    return _original_layer_init(self, *args, **kwargs)
+
+
+Layer.__init__ = _patched_layer_init
 
 # =========================================================
 # CONFIGURATION
