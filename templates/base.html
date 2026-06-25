@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI-assisted multimodal infant cry analysis">
+  <title>{% block title %}Baby Cry Analyzer{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <header class="navbar">
+    <a class="brand" href="{{ url_for('dashboard') if user else url_for('login') }}">
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a5.5 5.5 0 0 0-5.5 5.5v1.25A4.75 4.75 0 0 0 8 19.45V21h8v-1.55a4.75 4.75 0 0 0 1.5-9.2V9A5.5 5.5 0 0 0 12 3.5Z"/><path d="M9.5 13.5h.01M14.5 13.5h.01M10 16.5c1.2.8 2.8.8 4 0"/></svg>
+      </span>
+      <span class="brand-copy">Nurture<span>AI</span><small>Infant Cry Intelligence</small></span>
+    </a>
+
+    <nav class="nav-links">
+      {% if user %}
+        <div class="profile-menu">
+          <button class="profile-trigger" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Open profile menu">
+            <span class="profile-avatar profile-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/></svg>
+            </span>
+          </button>
+          <div class="profile-dropdown">
+            <div class="profile-summary">
+              <span class="profile-avatar large">{{ user.name[0] | upper }}</span>
+              <div>
+                <strong>{{ user.name }}</strong>
+                <small>{{ user.email }}</small>
+              </div>
+            </div>
+            <a class="profile-logout" href="{{ url_for('history') }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h4M16 11h4M12 7v10m-5-5h10"/></svg>
+              <span><strong>History</strong><small>View past reports</small></span>
+            </a>
+            <a class="profile-logout" href="{{ url_for('feedback') }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/><path d="M11 12h2v2h-2zm0-6h2v4h-2z"/></svg>
+              <span><strong>Feedback</strong><small>Share your thoughts</small></span>
+            </a>
+            
+            <div class="profile-divider"></div>
+            <a class="profile-logout" href="{{ url_for('logout') }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4m4-4H9"/></svg>
+              <span><strong>Sign out</strong><small>End this session securely</small></span>
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <a class="{{ 'active' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}">Login</a>
+        <a class="button small primary" href="{{ url_for('signup') }}">Sign Up</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <div class="page-body">
+    {% block content %}{% endblock %}
+
+    {% block live_stream %}
+    {% if user and request.endpoint == 'dashboard' %}
+  <section class="live-stream-section upload-section" id="live-stream-section">
+    <div class="upload-heading">
+      <div>
+        <span class="section-kicker">Live capture</span>
+        <h2>Record an infant cry live</h2>
+        <p>Use your device camera to capture a 10-second video with audio. The recording runs through the same multimodal analysis as an upload.</p>
+      </div>
+      <span class="privacy-chip"><i></i> Private session</span>
+    </div>
+
+    <div class="live-stream-card upload-card">
+      <div class="live-stream-inner drop-zone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14M5 18h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2Z"/></svg>
+        </div>
+        <h3>Capture from your camera</h3>
+        <p>Record a clear clip with audible crying and your baby visible in frame</p>
+        <button id="live-stream-btn" class="button primary live-stream-btn" type="button">
+          <span class="live-indicator"></span>
+          Start live recording
+        </button>
+        <small>For best results, use good lighting and hold the device steady</small>
+        <div class="info-panel live-stream-info">
+          <strong>Same analysis as upload</strong>
+          Your recording is processed for this session. Audio frequency patterns and visual emotion cues are evaluated together.
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% endblock %}
+
+    {% block content_after %}{% endblock %}
+  </div>
+
+  <footer class="site-footer">
+    <div>
+      <a class="footer-brand" href="{{ url_for('dashboard') if user else url_for('login') }}">NurtureAI</a>
+      <span>AI-assisted insight for more confident care.</span>
+    </div>
+    <p>For informational use only. Not a substitute for medical advice.</p>
+  </footer>
+
+  <!-- Global Analysis Overlay -->
+  <div class="analysis-overlay" id="analysis-overlay" hidden>
+    <div class="loader-card">
+      <div class="loader-ring"><span>AI</span></div>
+      <span class="section-kicker">Analysis in progress</span>
+      <h3>Interpreting multimodal signals</h3>
+      <p>Audio and visual models are working together to prepare your report.</p>
+      <div class="loading-track"><span></span></div>
+    </div>
+  </div>
+
+  <!-- Live Recording Modal Overlay -->
+  <div class="recording-overlay" id="recording-overlay" hidden>
+    <div class="recording-modal">
+      <button class="recording-close" id="recording-close-btn" aria-label="Close modal">&times;</button>
+
+      <div class="recording-heading upload-heading">
+        <div>
+          <span class="section-kicker">Live Recording</span>
+          <h3 id="recording-modal-title">Record Infant Cry</h3>
+          <p id="recording-modal-desc">Align your baby in the camera frame. We will record a 10-second video with audio.</p>
+        </div>
+        <span class="privacy-chip"><i></i> Private session</span>
+      </div>
+
+      <div class="recording-card">
+        <div class="recording-preview-container">
+          <video id="recording-preview-video" autoplay muted playsinline></video>
+          <div class="recording-status" id="recording-status-badge">
+            <span class="status-dot"></span>
+            <span id="recording-status-text">Preparing camera...</span>
+          </div>
+          <div class="recording-countdown" id="recording-countdown-timer" hidden>10</div>
+        </div>
+
+        <div class="recording-details">
+          <span class="section-kicker">Camera preview</span>
+          <h3>Live capture session</h3>
+          <p class="recording-detail-desc">Position your baby in frame with good lighting and minimal background noise.</p>
+
+          <div class="info-panel">
+            <strong>How this works</strong>
+            We capture a 10-second clip with audio, then run the same multimodal analysis used for uploaded videos.
+          </div>
+
+          <ul class="recording-tips">
+            <li>Keep your baby centered and clearly visible</li>
+            <li>Ensure crying is audible in the recording</li>
+            <li>Recording stops automatically after 10 seconds</li>
+          </ul>
+
+          <div class="modal-actions">
+            <button class="button secondary" id="recording-cancel-btn">Cancel</button>
+            <button class="button primary" id="recording-start-btn" disabled>Start Recording</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

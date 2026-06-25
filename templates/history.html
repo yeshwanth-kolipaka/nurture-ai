@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}History | Baby Cry Analyzer{% endblock %}
+
+{% block body_class %}history-page{% endblock %}
+
+{% block content %}
+<main class="content-section">
+  <div class="history-header">
+    <div class="section-heading">
+      <span class="section-kicker">Your history</span>
+      <h2>Saved cry analysis reports</h2>
+      <p>Review your previous uploads and analysis reports.</p>
+    </div>
+    <a class="button secondary" href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a>
+  </div>
+
+  {% if history %}
+    <div class="history-grid">
+      {% for item in history %}
+        <article class="glass-card history-card">
+          <div class="history-top">
+            <span class="history-date">{{ item.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            <span class="history-name">{{ item.original_name }}</span>
+          </div>
+          <div class="history-summary">
+            <div class="history-result">
+              <span class="history-label">Result</span>
+              <strong>{{ item.result.final_state | replace('_', ' ') | title }}</strong>
+            </div>
+            <div class="history-conf">
+              <span class="history-label">Confidence</span>
+              <strong>{{ (item.result.final_confidence * 100) | round(1) }}%</strong>
+            </div>
+          </div>
+          <div class="history-actions">
+            <a class="button secondary" href="{{ url_for('history_item', item_index=loop.index0) }}">View report</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="glass-card empty-state">
+      <div class="large-icon">H</div>
+      <h2>No saved history yet</h2>
+      <p>Your past analysis reports will appear here after you upload a video.</p>
+      <a class="button primary" href="{{ url_for('dashboard') }}#upload-section">Upload Video Now</a>
+    </section>
+  {% endif %}
+</main>
+{% endblock %}

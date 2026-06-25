@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Baby Cry Analyzer{% endblock %}
+
+{% block content %}
+<main class="center-page">
+  <section class="glass-card empty-state">
+    <div class="large-icon">B</div>
+    <h1>Baby Cry Analyzer</h1>
+    <p>Understand your baby's needs with intelligent audio and visual analysis.</p>
+    <a class="button primary" href="{{ url_for('login') }}">Get started</a>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback | Baby Cry Analyzer{% endblock %}
+
+{% block body_class %}history-page{% endblock %}
+
+{% block content %}
+<main class="content-section">
+  <div class="history-header">
+    <div class="section-heading">
+      <span class="section-kicker">Feedback</span>
+      <h2>We'd love to hear from you</h2>
+      <p>Your suggestions help us improve the experience for every caregiver.</p>
+    </div>
+    <a class="button secondary" href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a>
+  </div>
+
+  <section class="glass-card" style="max-width: 600px; margin: 0 auto; padding: 36px;">
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="width: 60px; height: 60px; margin: 0 auto 16px; display: grid; place-items: center; border-radius: 16px; background: #fef3f2; color: #e04f5f;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/><path d="M11 12h2v2h-2zm0-6h2v4h-2z"/></svg>
+      </div>
+      <h3 style="margin: 0 0 6px; font: 700 1.3rem 'Manrope', sans-serif; color: var(--navy);">Contact us</h3>
+      <p style="margin: 0; color: #667085; font-size: .9rem;">For any queries or feedback, reach out to us via email.</p>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fafbfc;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e04f5f" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+      <a href="mailto:multimodalproject2026@gmail.com" style="color: var(--navy); font-weight: 600; font-size: .95rem; text-decoration: none;">multimodalproject2026@gmail.com</a>
+    </div>
+
+    <p style="margin: 20px 0 0; text-align: center; color: #98a2b3; font-size: .8rem;">We typically respond within 24 hours.</p>
+  </section>
+</main>
+{% endblock %}
