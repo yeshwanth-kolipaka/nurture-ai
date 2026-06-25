@@ -1,7 +1,7 @@
 flask
 gunicorn
-tensorflow==2.16.2
-keras==3.3.3
+tensorflow==2.17.1
+keras==3.5.0
 opencv-python
 numpy
 librosa
