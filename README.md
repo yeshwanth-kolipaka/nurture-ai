@@ -185,6 +185,11 @@ nurture-ai/
 │   ├── multiclass_cry_model.keras
 │   ├── visual_emotion_model.keras
 │   └── *.npy                            # Class names & normalization stats
+├── notebooks/                            # Colab training notebooks
+│   ├── audio_model.ipynb
+│   ├── binary_model.ipynb
+│   ├── video_model.ipynb
+│   └── fusion_model.ipynb
 ├── static/
 │   ├── css/
 │   │   └── style.css
