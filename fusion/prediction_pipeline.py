@@ -350,26 +350,15 @@ def run_multimodal_pipeline(video_path):
     try:
 
         # -------------------------------------------------
-        # TEMP AUDIO PATH
+        # TEMP AUDIO PATH (unique per request)
         # -------------------------------------------------
 
-        audio_output_path = os.path.abspath(
-
-            os.path.join(
-
-                "uploads",
-
-                "temp_audio.wav"
-            )
+        audio_tmp = tempfile.NamedTemporaryFile(
+            suffix=".wav", delete=False
         )
-
-        # -------------------------------------------------
-        # REMOVE OLD AUDIO
-        # -------------------------------------------------
-
-        if os.path.exists(audio_output_path):
-
-            os.remove(audio_output_path)
+        audio_output_path = audio_tmp.name
+        audio_tmp.close()
+        _TEMP_FILES.append(audio_output_path)
 
         # -------------------------------------------------
         # FFmpeg COMMAND
@@ -461,116 +450,69 @@ def run_multimodal_pipeline(video_path):
                 ]
 
             # =============================================
-            # MFCC
+            # NORMALIZE (for binary model — matches its training)
             # =============================================
 
-            mfcc = librosa.feature.mfcc(
+            audio = librosa.util.normalize(audio)
 
-                y=audio,
+            # =============================================
+            # BINARY FEATURES (no preemphasis)
+            # =============================================
 
-                sr=sr,
-
-                n_mfcc=N_MFCC
+            bin_mfcc = librosa.feature.mfcc(
+                y=audio, sr=sr, n_mfcc=N_MFCC
             )
+            bin_delta = librosa.feature.delta(bin_mfcc)
+            bin_delta2 = librosa.feature.delta(bin_mfcc, order=2)
+            bin_features = np.concatenate(
+                [bin_mfcc, bin_delta, bin_delta2], axis=0
+            ).T
 
-            # =============================================
-            # DELTA
-            # =============================================
-
-            delta = librosa.feature.delta(
-                mfcc
-            )
-
-            # =============================================
-            # DELTA²
-            # =============================================
-
-            delta2 = librosa.feature.delta(
-
-                mfcc,
-
-                order=2
-            )
-
-            # =============================================
-            # FEATURE STACKING
-            # =============================================
-
-            features = np.concatenate(
-
-                [mfcc, delta, delta2],
-
-                axis=0
-            )
-
-            features = features.T
-
-            # =============================================
-            # FIX TIME STEPS
-            # =============================================
-
-            if features.shape[0] < MAX_TIME_STEPS:
-
-                padding = (
-
-                    MAX_TIME_STEPS
-                    -
-                    features.shape[0]
+            if bin_features.shape[0] < MAX_TIME_STEPS:
+                pad = MAX_TIME_STEPS - bin_features.shape[0]
+                bin_features = np.pad(
+                    bin_features, ((0, pad), (0, 0))
                 )
-
-                features = np.pad(
-
-                    features,
-
-                    (
-                        (0, padding),
-                        (0, 0)
-                    )
-                )
-
             else:
-
-                features = features[
-                    :MAX_TIME_STEPS
-                ]
-
-            # =============================================
-            # NORMALIZATION
-            # =============================================
-
-            features = (
-
-                features - audio_mean
-
-            ) / (
-
-                audio_std + 1e-6
-            )
-
-            # =============================================
-            # SAVE FEATURES FOR MULTICLASS MODEL
-            # =============================================
-
-            multiclass_features = features.copy()
-
-            # =============================================
-            # BINARY NORMALIZATION
-            # =============================================
+                bin_features = bin_features[:MAX_TIME_STEPS]
 
             binary_features = (
-
-                multiclass_features - binary_mean
-
-            ) / (
-
-                binary_std + 1e-6
+                (bin_features - binary_mean) / (binary_std + 1e-6)
             )
 
             binary_input = np.expand_dims(
+                binary_features, axis=0
+            )
 
-                binary_features,
+            # =============================================
+            # PRE-EMPHASIS (for multiclass model — matches its training)
+            # =============================================
 
-                axis=0
+            audio = librosa.effects.preemphasis(audio)
+
+            # =============================================
+            # MULTICLASS FEATURES (with preemphasis)
+            # =============================================
+
+            mc_mfcc = librosa.feature.mfcc(
+                y=audio, sr=sr, n_mfcc=N_MFCC
+            )
+            mc_delta = librosa.feature.delta(mc_mfcc)
+            mc_delta2 = librosa.feature.delta(mc_mfcc, order=2)
+            mc_features = np.concatenate(
+                [mc_mfcc, mc_delta, mc_delta2], axis=0
+            ).T
+
+            if mc_features.shape[0] < MAX_TIME_STEPS:
+                pad = MAX_TIME_STEPS - mc_features.shape[0]
+                mc_features = np.pad(
+                    mc_features, ((0, pad), (0, 0))
+                )
+            else:
+                mc_features = mc_features[:MAX_TIME_STEPS]
+
+            multiclass_features = (
+                (mc_features - audio_mean) / (audio_std + 1e-6)
             )
 
             # =============================================
@@ -649,7 +591,7 @@ def run_multimodal_pipeline(video_path):
     # WEIGHTED FUSION
     # =====================================================
 
-    if audio_result == "no_cry":
+    if audio_result in ("no_cry", "no_audio"):
 
         current_audio_weight = 0.0
 
@@ -761,14 +703,14 @@ def run_multimodal_pipeline(video_path):
         )
 
     # =====================================================
-    # CASE 3 — TIRED / SLEEPY
+    # CASE 3 — TIRED / SLEEPY (both modalities must agree)
     # =====================================================
 
     elif (
 
         audio_result == "tired"
 
-        or
+        and
 
         video_result == "sleepy"
     ):
@@ -780,8 +722,8 @@ def run_multimodal_pipeline(video_path):
 
         reasoning = (
 
-            "Sleep-related emotional "
-            "signals detected"
+            "Both audio and visual cues "
+            "indicate tiredness"
         )
 
         recommendation = (
@@ -816,7 +758,35 @@ def run_multimodal_pipeline(video_path):
         )
 
     # =====================================================
-    # CASE 5 — NORMAL
+    # CASE 5 — NO CRY DETECTED
+    # =====================================================
+
+    elif (
+
+        audio_result == "no_cry"
+    ):
+
+        final_state = (
+
+            "No crying detected"
+        )
+
+        reasoning = (
+
+            f"Audio: no_cry "
+            f"({round(audio_confidence, 2)}), "
+            f"Video: {video_result} "
+            f"({round(video_confidence, 2)})"
+        )
+
+        recommendation = (
+
+            "Baby appears calm — "
+            "no immediate concern"
+        )
+
+    # =====================================================
+    # CASE 6 — NORMAL (visual only)
     # =====================================================
 
     elif (
@@ -852,14 +822,16 @@ def run_multimodal_pipeline(video_path):
 
         final_state = (
 
-            f"Detected state: "
-            f"{audio_result} + {video_result}"
+            "Unable to determine baby's "
+            "state with high confidence"
         )
 
         reasoning = (
 
-            "Combined multimodal "
-            "prediction generated"
+            f"Audio: {audio_result} "
+            f"({round(audio_confidence, 2)}), "
+            f"Video: {video_result} "
+            f"({round(video_confidence, 2)})"
         )
 
         recommendation = (
